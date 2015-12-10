@@ -1,16 +1,5 @@
 package pl.softech.smpp;
 
-import static java.util.Arrays.asList;
-
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.PostConstruct;
-
 import org.jsmpp.session.SMPPServerSession;
 import org.jsmpp.session.SMPPServerSessionListener;
 import org.jsmpp.session.ServerMessageReceiverListener;
@@ -24,6 +13,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static java.util.Arrays.asList;
 
 @Service
 public class SmppServerSimulator implements ApplicationContextAware {
@@ -62,7 +61,20 @@ public class SmppServerSimulator implements ApplicationContextAware {
     }
 
     @PostConstruct
-    public void start() throws IOException {
+    public void start() {
+
+        executorService.execute(() -> {
+            try {
+                run();
+            } catch (IOException e) {
+                LOGGER.error("", e);
+            }
+        });
+
+    }
+
+
+    private void run() throws IOException {
 
         sessionListener = new SMPPServerSessionListener(port, 1000, new ServerSocketConnectionFactory());
 
