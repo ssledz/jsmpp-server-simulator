@@ -16,7 +16,7 @@ public class SmppServerRestController {
     @Autowired
     private SmppServerSimulator serverSimulator;
 
-    @RequestMapping(value = "/submitSm", method = RequestMethod.POST, consumes = "application/json;charset=utf-8")
+    @RequestMapping(value = "/submit-sm", method = RequestMethod.POST, consumes = "application/json;charset=utf-8")
     public void submitSm(@RequestBody ShortMessage message) throws Exception {
         serverSimulator.sendMessage(message);
     }
