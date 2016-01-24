@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.google.common.eventbus.EventBus;
+
 @SpringBootApplication
 @EnableAutoConfiguration
 @Configuration
@@ -24,6 +26,21 @@ public class App {
     @Bean
     public MessageIDGenerator messageIDGenerator() {
         return new RandomMessageIDGenerator();
+    }
+
+    @Bean
+    public DefaultServerMessageReceiverListener defaultServerMessageReceiverListener() {
+        return new DefaultServerMessageReceiverListener();
+    }
+
+    @Bean
+    public DefaultServerResponseDelivery defaultServerResponseDelivery() {
+        return new DefaultServerResponseDelivery();
+    }
+
+    @Bean
+    public EventBus eventBus() {
+        return new EventBus();
     }
 
     public static void main(String[] args) {

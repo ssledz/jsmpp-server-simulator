@@ -10,12 +10,16 @@ import org.jsmpp.session.BindRequest;
 import org.jsmpp.session.SMPPServerSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class SmppBindTask implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SmppBindTask.class);
 
     private final SMPPServerSession serverSession;
+
+    @Autowired
+    private ServerSessionRepository serverSessionRepository;
 
     public SmppBindTask(SMPPServerSession serverSession) {
         this.serverSession = serverSession;
@@ -33,6 +37,8 @@ public class SmppBindTask implements Runnable {
                 LOGGER.error("Invalid system id", e);
                 bindRequest.reject(SMPPConstant.STAT_ESME_RSYSERR);
             }
+
+            serverSessionRepository.bind(bindRequest, serverSession);
 
         } catch (IllegalStateException e) {
             LOGGER.error("System error", e);

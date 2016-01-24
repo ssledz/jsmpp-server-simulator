@@ -1,6 +1,10 @@
 package pl.softech.smpp;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by ssledz on 10.12.15.
@@ -9,11 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/ctl")
 public class SmppServerRestController {
 
-    @ResponseBody
-    @RequestMapping(value = "/submitSm", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-    public SubmitShortMessageResponse submitSm(@RequestBody ShortMessage message) {
-        return new SubmitShortMessageResponse("1234: " + message.getBody());
-    }
+    @Autowired
+    private SmppServerSimulator serverSimulator;
 
+    @RequestMapping(value = "/submitSm", method = RequestMethod.POST, consumes = "application/json;charset=utf-8")
+    public void submitSm(@RequestBody ShortMessage message) throws Exception {
+        serverSimulator.sendMessage(message);
+    }
 
 }
