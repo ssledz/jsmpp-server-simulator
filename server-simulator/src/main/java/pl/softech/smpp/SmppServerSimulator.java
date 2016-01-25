@@ -123,7 +123,7 @@ public class SmppServerSimulator {
     /**
      * Sending message encoded in ISO-8859-1
      */
-    public void sendMessage(ShortMessage message) throws Exception {
+    public void sendMessage(ShortMessageDto message) throws Exception {
 
         byte[] shortMessageBytes = message.getBody().getBytes(Charset.forName("ISO-8859-1"));
 
@@ -134,7 +134,7 @@ public class SmppServerSimulator {
                 message.getSystemType());
 
         LOGGER.info("Sending message: '{}' to ({},{}, {})...", message.getBody(), message.getSystemId(),
-                message.getSystemType(), message.getAddress());
+                message.getSystemType(), message.getDestMsisdn());
 
         session.deliverShortMessage("st", //
                 TypeOfNumber.UNKNOWN, //
@@ -142,7 +142,7 @@ public class SmppServerSimulator {
                 "1234", //
                 TypeOfNumber.UNKNOWN, //
                 NumberingPlanIndicator.UNKNOWN, //
-                message.getAddress(), //
+                message.getDestMsisdn(), //
                 new ESMClass(), //
                 (byte) 0, //
                 (byte) 0, //
@@ -151,7 +151,7 @@ public class SmppServerSimulator {
                 shortMessageBytes);
 
         LOGGER.info("Message: '{}' already sent to ({},{})", message.getBody(), message.getSystemId(),
-                message.getSystemType(), message.getAddress());
+                message.getSystemType(), message.getDestMsisdn());
     }
 
     private void acceptConnection() throws IOException {

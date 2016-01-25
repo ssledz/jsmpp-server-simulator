@@ -1,37 +1,29 @@
 package pl.softech.smpp;
 
-import static pl.softech.smpp.Specifications.deliveryReceiptSpecification;
-
-import java.util.concurrent.ExecutorService;
-
-import org.jsmpp.bean.CancelSm;
-import org.jsmpp.bean.DataSm;
-import org.jsmpp.bean.QuerySm;
-import org.jsmpp.bean.ReplaceSm;
-import org.jsmpp.bean.SubmitMulti;
-import org.jsmpp.bean.SubmitMultiResult;
-import org.jsmpp.bean.SubmitSm;
+import org.jsmpp.bean.*;
 import org.jsmpp.extra.ProcessRequestException;
-import org.jsmpp.session.DataSmResult;
-import org.jsmpp.session.QuerySmResult;
-import org.jsmpp.session.SMPPServerSession;
-import org.jsmpp.session.ServerMessageReceiverListener;
-import org.jsmpp.session.Session;
-import org.jsmpp.util.MessageIDGenerator;
+import org.jsmpp.session.*;
 import org.jsmpp.util.MessageId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.concurrent.ExecutorService;
+
+import static pl.softech.smpp.Specifications.deliveryReceiptSpecification;
 
 public class DefaultServerMessageReceiverListener implements ServerMessageReceiverListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultServerMessageReceiverListener.class);
 
     @Autowired
-    private MessageIDGenerator messageIdGenerator;
+    private ExecutorService executorService;
 
     @Autowired
-    private ExecutorService executorService;
+    private ShortMessageRepository shortMessageRepository;
+
+    @Autowired
+    private ShortMessageFactory shortMessageFactory;
 
     @Override
     public DataSmResult onAcceptDataSm(DataSm dataSm, Session source) throws ProcessRequestException {
@@ -41,17 +33,19 @@ public class DefaultServerMessageReceiverListener implements ServerMessageReceiv
 
     @Override
     public MessageId onAcceptSubmitSm(SubmitSm submitSm, SMPPServerSession source) throws ProcessRequestException {
-        MessageId messageId = messageIdGenerator.newMessageId();
 
-        LOGGER.info("Receiving submit_sm '{}', and return message id {}", new String(submitSm.getShortMessage()),
-                messageId);
+        ShortMessage message = shortMessageFactory.createFrom(submitSm);
+
+        message = shortMessageRepository.save(message);
+
+        LOGGER.info("Receiving submit_sm '{}', and return message id {}", message.getBody(),
+                message.getMessageId());
 
         if (deliveryReceiptSpecification().isSatisfiedBy(submitSm)) {
-            executorService.execute(new SmppDeliveryReceiptTask(source, submitSm, messageId));
+            executorService.execute(new SmppDeliveryReceiptTask(source, submitSm, message.getMessageId()));
         }
 
-        return messageId;
-
+        return message.getMessageId();
     }
 
     @Override
