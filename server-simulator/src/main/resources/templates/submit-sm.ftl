@@ -33,7 +33,7 @@
 
         <p>
             <label for="address">Msisdn</label>
-            <input type="text" id="address" name="address" ng-model="message.msisdn"/>
+            <input type="text" id="address" name="address" ng-model="message.address"/>
         </p>
 
         <p>

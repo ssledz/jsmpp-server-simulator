@@ -139,10 +139,10 @@ public class SmppServerSimulator {
         session.deliverShortMessage("st", //
                 TypeOfNumber.UNKNOWN, //
                 NumberingPlanIndicator.UNKNOWN, //
-                "1234", //
+                message.getAddress(), //
                 TypeOfNumber.UNKNOWN, //
                 NumberingPlanIndicator.UNKNOWN, //
-                message.getAddress(), //
+                "1234", //
                 new ESMClass(), //
                 (byte) 0, //
                 (byte) 0, //
